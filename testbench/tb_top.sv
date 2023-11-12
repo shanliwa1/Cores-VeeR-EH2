@@ -422,7 +422,7 @@ module tb_top;
         nmi_int   = 0;
 
         $readmemh("program.hex",  lmem.mem);
-        $readmemh("program.hex",  imem.mem);
+        //$readmemh("program.hex",  imem.mem);
         tp = $fopen("trace_port.csv","w");
         el = $fopen("exec.log","w");
         $fwrite (el, "//   Cycle : #inst  hart   pc    opcode    reg=value   ; mnemonic\n");

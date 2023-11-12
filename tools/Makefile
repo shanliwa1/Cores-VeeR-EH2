@@ -17,9 +17,9 @@
 # need to be removed for opensource
 CONF_PARAMS = -set=build_axi4
 
-TEST_CFLAGS = -g -O3 -funroll-all-loops 
+TEST_CFLAGS = -ggdb -O0 -funroll-all-loops 
 
-ABI = -mabi=ilp32 -march=rv32imac
+ABI = -mabi=ilp32 -march=rv32imac_zicsr
 
 
 
@@ -88,7 +88,7 @@ includes = -I${BUILD_DIR}
 
 # CFLAGS for verilator generated Makefiles. Without -std=c++11 it
 # complains for `auto` variables
-CFLAGS += "-std=c++11"
+CFLAGS += "-std=c++20"
 
 # Optimization for better performance; alternative is nothing for
 # slower runtime (faster compiles) -O2 for faster runtime (slower
@@ -114,7 +114,7 @@ ${BUILD_DIR}/defines.h:
 
 verilator-build: ${TBFILES} ${BUILD_DIR}/defines.h test_tb_top.cpp
 	echo '`undef RV_ASSERT_ON' >> ${BUILD_DIR}/common_defines.vh
-	$(VERILATOR)  --cc -CFLAGS ${CFLAGS} $(defines) \
+	$(VERILATOR) --timing --cc -CFLAGS ${CFLAGS} $(defines) \
 	  $(includes) -I${RV_ROOT}/testbench -f ${RV_ROOT}/testbench/flist \
 	  -Wno-WIDTH -Wno-UNOPTFLAT -Wno-IMPLICIT ${TBFILES} --top-module tb_top \
 	  -exe test_tb_top.cpp --autoflush $(VERILATOR_DEBUG)
@@ -184,7 +184,7 @@ program.hex:
 else
 program.hex: $(OFILES) $(LINK)
 	@echo Building $(TEST)
-	$(GCC_PREFIX)-gcc $(ABI) -nostartfiles -lgcc -T$(LINK) -Wl,-Map=$(TEST).map -o $(TEST).exe $(OFILES)
+	$(GCC_PREFIX)-gcc $(ABI) -ggdb -nostartfiles -lgcc -T$(LINK) -Wl,-Map=$(TEST).map -o $(TEST).exe $(OFILES)
 	$(GCC_PREFIX)-objcopy -O verilog  $(TEST).exe program.hex
 	$(GCC_PREFIX)-objdump -S  $(TEST).exe > $(TEST).dis
 	@echo Completed building $(TEST)
